@@ -28,6 +28,38 @@ namespace ProiectFastTrack.Utils
             };
           
         }
+
+        public static Student ToEntity(this StudentToUpdateDto student)
+        {
+            if (student == null)
+            {
+                return null;
+            }
+
+            return new Student
+            {
+                Id = student.Id,
+                Nume = student.Nume,
+                Varstra = student.Varstra,
+            };
+
+        }
+
+        public static Address ToEntity(this AddresToUpdateDto addresToUpdate)
+        {
+            if(addresToUpdate == null)
+            {
+                return null;
+            }
+            return new Address
+            {
+                Numar = addresToUpdate.Numar,
+                Oras = addresToUpdate.Oras,
+                Strada = addresToUpdate.Strada
+            };
+        }
+
+        
     };
 
 }

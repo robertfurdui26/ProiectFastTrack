@@ -40,7 +40,6 @@ namespace ProiectFastTrack.Controllers
 
         [HttpGet("/id/{id}")]
         public StudentGetDto GetStudentById(int id) =>
-        
              DataAccesLayerSingleton.Instance.GetStudentById(id).ToDto();
 
 
@@ -52,9 +51,28 @@ namespace ProiectFastTrack.Controllers
         [HttpPost]
 
         public StudentGetDto CreateStudent([FromBody] StudentCreateDto studentToCreate) =>
-        
             DataAccesLayerSingleton.Instance.CreateStudent(studentToCreate.ToEntity()).ToDto();
+
+        /// <summary>
+        /// Update a student
+        /// </summary>
+        /// <param name="studentToUpdate"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        public StudentGetDto UpdateStudent([FromBody] StudentToUpdateDto studentToUpdate) =>
+            DataAccesLayerSingleton.Instance.UpdateStudent(studentToUpdate.ToEntity()).ToDto();
+
+        /// <summary>
+        /// Update or Create Address for student
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="addresToUpdate"></param>
+        [HttpPut("{id}")]
+        public void UpdateStudentAddres( int id, [FromBody] AddresToUpdateDto addresToUpdate) =>     
+            DataAccesLayerSingleton.Instance.UpdateOrCreateStudentAddress(id, addresToUpdate.ToEntity());
+
         
+          
         
     }
 }

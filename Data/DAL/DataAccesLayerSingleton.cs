@@ -1,4 +1,6 @@
 ﻿using Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,5 +114,48 @@ namespace Data.DAL
             return student;
 
         }
+
+        public Student UpdateStudent(Student studentToUpdate)
+        {
+            using var cdv = new StudentDbContext();
+
+
+            var student = cdv.Students.FirstOrDefault(c => c.Id == studentToUpdate.Id);
+            if(student == null)
+            {
+              //throw exception
+            }
+            student.Varstra = studentToUpdate.Varstra;
+            student.Nume = studentToUpdate.Nume;
+
+            cdv.SaveChanges();
+            return student;
+
+        }
+
+        public void UpdateOrCreateStudentAddress(int studentId, Address nouaAdresa)
+        {
+            using var cdv = new StudentDbContext();
+
+            var student = cdv.Students.Include(s =>s.Adresa).FirstOrDefault( s => s.Id == studentId);
+            if( student == null)
+            {
+                //throw exception
+            }
+
+            if(student.Adresa == null)
+            {
+                student.Adresa = new Address();
+            }
+
+            student.Adresa.Numar = nouaAdresa.Numar;
+            student.Adresa.Strada = nouaAdresa.Strada;
+            student.Adresa.Oras = nouaAdresa.Oras;
+
+            cdv.SaveChanges();
+        }
+
+        
+
     }
 }
