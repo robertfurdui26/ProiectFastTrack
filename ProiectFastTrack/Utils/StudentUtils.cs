@@ -14,6 +14,8 @@ namespace ProiectFastTrack.Utils
           return   new StudentGetDto { Id = student.Id, Nume = student.Nume, Varstra = student.Varstra };
         }
 
+       
+
         public static Student ToEntity( this StudentCreateDto student )
         {
             if(student == null)
@@ -28,6 +30,8 @@ namespace ProiectFastTrack.Utils
             };
           
         }
+
+        
 
         public static Student ToEntity(this StudentToUpdateDto student)
         {

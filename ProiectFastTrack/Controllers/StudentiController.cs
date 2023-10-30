@@ -1,8 +1,10 @@
 ﻿using Data.DAL;
+using Data.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProiectFastTrack.Dto;
 using ProiectFastTrack.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProiectFastTrack.Controllers
 {
@@ -10,69 +12,95 @@ namespace ProiectFastTrack.Controllers
     [ApiController]
     public class StudentiController : ControllerBase
     {
-        /// <summary>
-        /// Instaleaza Db-ul
-        /// </summary>
-
-        [HttpPost("seed")]
-        public void Seed() => DataAccesLayerSingleton.Instance.Seed();
-
-
-        /// <summary>
-        /// Returns all student in the db
-        /// </summary>
-
-        [HttpGet]
-
-        public IEnumerable<StudentGetDto> GetAllStudenst()
+        private readonly IDataAccesLayerService dal;
+        public StudentiController(IDataAccesLayerService dal)
         {
-            var allStudents = DataAccesLayerSingleton.Instance.GetAllStudents();
-            return allStudents.Select(s => s.ToDto()).ToList();
-
-
+            this.dal = dal;
         }
 
         /// <summary>
-        /// Get Student by id
+        /// Returns all the students in the db
         /// </summary>
-        /// <param name="id"></param>
+        [HttpGet]
+        public IEnumerable<StudentGetDto> GetAllStudents()
+        {
+            var allStudents = dal.GetAllStudents();
+
+            return allStudents.Select(s => s.ToDto()).ToList();
+        }
+
+
+        /// <summary>
+        /// Gets a student by id
+        /// </summary>
+        /// <param name="id">id of the student</param>
         /// <returns>student data</returns>
-
         [HttpGet("/id/{id}")]
-        public StudentGetDto GetStudentById(int id) =>
-             DataAccesLayerSingleton.Instance.GetStudentById(id).ToDto();
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StudentGetDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+
+        public ActionResult<StudentGetDto> GetStudentById([Range(10, int.MaxValue)] int id) =>
+            Ok(dal.GetStudentById(id).ToDto());
+
 
 
         /// <summary>
-        /// Create Student
+        /// Creates a student
         /// </summary>
-        /// <returns>create student</returns>
-
+        /// <param name="studentToCreate">student to create data</param>
+        /// <returns>created student data</returns>
         [HttpPost]
-
         public StudentGetDto CreateStudent([FromBody] StudentCreateDto studentToCreate) =>
-            DataAccesLayerSingleton.Instance.CreateStudent(studentToCreate.ToEntity()).ToDto();
+            dal.CreateStudent(studentToCreate.ToEntity()).ToDto();
 
         /// <summary>
-        /// Update a student
+        /// Updates a student
         /// </summary>
         /// <param name="studentToUpdate"></param>
         /// <returns></returns>
         [HttpPatch]
         public StudentGetDto UpdateStudent([FromBody] StudentToUpdateDto studentToUpdate) =>
-            DataAccesLayerSingleton.Instance.UpdateStudent(studentToUpdate.ToEntity()).ToDto();
+            dal.UpdateStudent(studentToUpdate.ToEntity()).ToDto();
+
 
         /// <summary>
-        /// Update or Create Address for student
+        /// sddshjjklasdjklasdkljjasldk
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="addresToUpdate"></param>
+        /// <param name="addressToUpdate"></param>
         [HttpPut("{id}")]
-        public void UpdateStudentAddres( int id, [FromBody] AddresToUpdateDto addresToUpdate) =>     
-            DataAccesLayerSingleton.Instance.UpdateOrCreateStudentAddress(id, addresToUpdate.ToEntity());
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public IActionResult UpdateStudentAddress([FromRoute] int id, [FromBody] AddresToUpdateDto addressToUpdate)
+        {
 
-        
-          
-        
+            if (dal.UpdateOrCreateStudentAddress(id, addressToUpdate.ToEntity()))
+            {
+                return Created("succeess", null);
+            }
+            return Ok();
+        }
+
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStudent(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest("id cannot be 0");
+            }
+            try
+            {
+                dal.DeleteStudent(id);
+            }
+            catch (InvalidIdException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            return Ok();
+        }
+
+
     }
 }

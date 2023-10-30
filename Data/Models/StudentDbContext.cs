@@ -7,23 +7,21 @@ using System.Threading.Tasks;
 
 namespace Data.Models
 {
-    internal class StudentDbContext : DbContext
+    internal class StudentDbContext : DbContext ,IStudentDbContext
     {
 
-        public DbSet<Student> Students { get; set; }
+      
 
-        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Curs> Curses { get; set; }
+        public DbSet<Address> Adrese { get; set; }
+        public DbSet<Student> Studenti { get ; set  }
 
-        public StudentDbContext()
+        public StudentDbContext(DbContextOptions<StudentDbContext> options) :base(options)
         {
             Database.EnsureCreated();
         }
 
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            builder.UseSqlServer(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\Furdui Robert\ProiectFastTrack\Data\Students.mdf"";Integrated Security=True");
-
-        }
+      
     }
 }

@@ -1,11 +1,22 @@
+using ProiectFastTrack.Extension;
+using ProiectFastTrack.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddControllers();
+var connString = builder.Configuration.GetConnectionString("SqlDbConnectionString");
+var custom = builder.Configuration["MyCustomField"].ToString();
+
+// Add services to the container.
+builder.Services.AddDataAccessLayer(connString);
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<InvalidIdExceptionFilter>();
+    options.Filters.Add<DuplicatedIdExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o => AddSwaggerDocumentation(o));
